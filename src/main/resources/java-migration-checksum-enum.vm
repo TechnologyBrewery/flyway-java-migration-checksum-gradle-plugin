@@ -1,0 +1,17 @@
+package ${package};
+
+public enum ${className} {
+#foreach($checksumAndSrcFile in $checksumAndSrcFileNamePairs)
+	${checksumAndSrcFile.getRight()}(${checksumAndSrcFile.getLeft()})#if($foreach.last);#else,#end
+#end
+
+	private int checksum;
+
+	private ${className}(int checksum) {
+		this.checksum = checksum;
+	}
+
+	public int getChecksum() {
+		return this.checksum;
+	}
+}

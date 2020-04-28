@@ -1,0 +1,34 @@
+plugins {
+	id 'java-gradle-plugin'
+	id 'com.gradle.plugin-publish' version '0.11.0'
+}
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+dependencies {
+	implementation 'org.apache.commons:commons-lang3:3.9'
+	implementation 'commons-io:commons-io:2.6'
+	implementation 'org.apache.velocity:velocity-engine-core:2.2'
+}
+
+pluginBundle {
+	website = 'https://bitbucket.org/cpointe/flyway-java-migration-checksum-gradle-plugin'
+	vcsUrl = 'https://bitbucket.org/cpointe/flyway-java-migration-checksum-gradle-plugin.git'
+	tags = ['flyway']
+}
+
+version = '1.0.0'
+
+gradlePlugin {
+	plugins {
+		flywayJavaMigrationChecksumPlugin {
+			id = 'org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin'
+			displayName = 'Java-based Flyway Migration Checksum Generation Plugin'
+			description = 'A plugin that provides baseline approach for generating checksums for Java-based Flyway database migrations'
+			implementationClass = 'org.bitbucket.cpointe.FlywayJavaMigrationChecksumPlugin'
+		}
+	}
+}
