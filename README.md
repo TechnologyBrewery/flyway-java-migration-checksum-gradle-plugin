@@ -12,7 +12,7 @@ checksums is generated, which may be easily used in Java-based migration impleme
 Apply the plugin in your buildscript:
 ```
 plugins {
-  id 'org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin' version '2.0.0'
+  id 'org.technologybrewery.flyway-java-migration-checksum-gradle-plugin' version '2.0.0'
 }
 ```
 Configure the plugin to specify the desired source files, which should be Java-based Flyway migrations, for which to

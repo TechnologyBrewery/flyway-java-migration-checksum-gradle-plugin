@@ -12,7 +12,7 @@ dependencies {
 	implementation 'org.apache.velocity:velocity-engine-core:2.3'
 }
 
-group = 'org.bitbucket.cpointe'
+group = 'org.technologybrewery'
 version = '2.0.0'
 
 gradlePlugin {
@@ -20,7 +20,7 @@ gradlePlugin {
 	vcsUrl = 'https://github.com/TechnologyBrewery/flyway-java-migration-checksum-gradle-plugin.git'
 	plugins {
 		flywayJavaMigrationChecksumPlugin {
-			id = 'org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin'
+			id = 'org.technologybrewery.flyway-java-migration-checksum-gradle-plugin'
 			displayName = 'Java-based Flyway Migration Checksum Generation Plugin'
 			description = 'A plugin that provides baseline approach for generating checksums for Java-based Flyway database migrations'
 			tags.set(['flyway'])
