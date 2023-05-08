@@ -1,12 +1,4 @@
-package org.bitbucket.cpointe;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.CRC32;
-
-import javax.inject.Inject;
+package org.technologybrewery;
 
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -20,23 +12,39 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.InvalidUserDataException;
+import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.file.DirectoryProperty;
+import org.gradle.api.file.FileTree;
 import org.gradle.api.file.RegularFile;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.Nested;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.util.PatternFilterable;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.CRC32;
 
 /**
  * Gradle task that uses Velocity to generate an enum class containing checksums of the specified Java-based Flyway
  * migration source files. The implemented checksum calculation approach is the same as that implemented by Flyway for
  * SQL-based migrations.
  */
-public class GenerateJavaMigrationChecksumTask extends DefaultTask {
+public abstract class GenerateJavaMigrationChecksumTask extends DefaultTask {
 
-	private FlywayJavaMigrationChecksumPluginExtension extension;
+	/**
+	 * Velocity template engine used to generate checksum enums based on a VTL template.
+	 */
+	private final VelocityEngine velocityEngine;
 
-	private VelocityEngine velocityEngine;
+	/**
+	 * Captures any Ant-style include/exclude patterns that may have been provided to further refine the target
+	 * set of migration source files contained within {@link #getMigrationSourceFiles()}.
+	 */
+	private PatternFilterable patternSet;
 
-	@Inject
 	public GenerateJavaMigrationChecksumTask() {
 		this.velocityEngine = new VelocityEngine();
 		this.velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
@@ -44,13 +52,69 @@ public class GenerateJavaMigrationChecksumTask extends DefaultTask {
 		this.velocityEngine.init();
 	}
 
-	@Nested
-	public FlywayJavaMigrationChecksumPluginExtension getExtension() {
-		return this.extension;
+	/**
+	 * Gets the destination directory at which the generated enum will be created.
+	 *
+	 * @return destination at which the generated enum will be created.
+	 */
+	@OutputDirectory
+	@Optional
+	public abstract DirectoryProperty getDestination();
+
+	/**
+	 * Gets the fully qualified name of the generated enum class that contains migration checksums.
+	 *
+	 * @return fully quality class name of the generated enum containing migration checksums.
+	 */
+	@Input
+	@Optional
+	public abstract Property<String> getChecksumEnumClassName();
+
+	/**
+	 * Gets a {@link FileTree} representing the filtered set of migration Java files for which checksums will be
+	 * calculated.
+	 *
+	 * @return filtered set of Java-based Flyway migration source files for which checksums will be calculated.
+	 */
+	@InputFiles
+	@SkipWhenEmpty
+	@PathSensitive(PathSensitivity.ABSOLUTE)
+	public FileTree getSource() {
+		return getMigrationSourceFiles().getAsFileTree().matching(getPatternSet());
 	}
 
-	protected void setExtension(FlywayJavaMigrationChecksumPluginExtension extension) {
-		this.extension = extension;
+	/**
+	 * Captures the original set of (unfiltered) migration source files that were specified via the plugin's
+	 * extension DSL.  This accessor is primarily utilized to link user-exposed properties on
+	 * {@link FlywayJavaMigrationChecksumPluginExtension} to the corresponding property in this class.
+	 *
+	 * @return original set of (unfiltered) source files that were specified via the plugin's extension DSL.
+	 */
+	@InputFiles
+	@SkipWhenEmpty
+	@PathSensitive(PathSensitivity.ABSOLUTE)
+	public abstract ConfigurableFileCollection getMigrationSourceFiles();
+
+
+	/**
+	 * Sets any Ant-style include/exclude patterns for filtering migration source files that were provided via
+	 * the plugin extension DSL.
+	 *
+	 * @param patternSet
+	 */
+	protected void setPatternSet(PatternFilterable patternSet) {
+		this.patternSet = patternSet;
+	}
+
+	/**
+	 * Gets any Ant-style include/exclude patterns for filtering migration source files that were provided via
+	 * the plugin extension DSL.
+	 *
+	 * @return
+	 */
+	@Internal
+	protected PatternFilterable getPatternSet() {
+		return this.patternSet;
 	}
 
 	/**
@@ -61,7 +125,7 @@ public class GenerateJavaMigrationChecksumTask extends DefaultTask {
 	public void generateChecksums() {
 		List<Pair<Integer, String>> checksumAndSrcFileNamePairs = new ArrayList<Pair<Integer, String>>();
 
-		for (File migrationSourceFile : getExtension().getSource().getFiles()) {
+		for (File migrationSourceFile : getSource().getFiles()) {
 			try (InputStream sourceFileInputStream = new FileInputStream(migrationSourceFile)) {
 				int checksum = calculateChecksum(sourceFileInputStream);
 				checksumAndSrcFileNamePairs.add(new ImmutablePair<Integer, String>(checksum,
@@ -71,14 +135,14 @@ public class GenerateJavaMigrationChecksumTask extends DefaultTask {
 						String.format("Could not read source file %s", migrationSourceFile.getAbsolutePath()), e);
 			}
 		}
-		String checksumEnumClassName = getExtension().getChecksumEnumClassName();
+		String checksumEnumClassName = getChecksumEnumClassName().get();
 		if (!StringUtils.contains(checksumEnumClassName, ".") || StringUtils.endsWith(checksumEnumClassName, ".java")) {
 			throw new InvalidUserDataException(String.format(
 					"Given checksum enum class name of %s is invalid - class "
 							+ "name must include a non-default package and not end with a .java file extension",
 					checksumEnumClassName));
 		}
-		Provider<RegularFile> checksumEnumFileProvider = getExtension().getDestination()
+		Provider<RegularFile> checksumEnumFileProvider = getDestination()
 				.file(StringUtils.replace(checksumEnumClassName, ".", "/") + ".java");
 		File checksumEnumFile = checksumEnumFileProvider.get().getAsFile();
 		checksumEnumFile.getParentFile().mkdirs();
@@ -121,4 +185,6 @@ public class GenerateJavaMigrationChecksumTask extends DefaultTask {
 
 		return (int) crc32.getValue();
 	}
+
+
 }

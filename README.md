@@ -12,7 +12,7 @@ checksums is generated, which may be easily used in Java-based migration impleme
 Apply the plugin in your buildscript:
 ```
 plugins {
-  id 'org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin' version '1.0.0'
+  id 'org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin' version '2.0.0'
 }
 ```
 Configure the plugin to specify the desired source files, which should be Java-based Flyway migrations, for which to
@@ -20,15 +20,15 @@ calculate checksums, and the name/location of the generated `Enum` class:
 ```
 flywayMigrationChecksum {
   // *REQUIRED* - location at which Java source files marked for checksum calculation may be found
-  source file('src/main/java/org/cpointe/db/migration')
+  source file('src/main/java/org/technologybrewery/db/migration')
 
   // Optional - base location at which the generated Enum file containing migration checksums will be created
   // Default value - build/generated/migration-checksum
-  destination file("$project.buildDir/generated/src/main/java")
+  destination = file("$project.buildDir/generated/src/main/java")
 
   // Optional - fully qualified class name of the generated Enum
   // Default value - db.migration.JavaMigrationChecksum
-  checksumEnumClassName 'org.bitbucket.cpointe.db.JavaMigrationChecksumEnum'
+  checksumEnumClassName = 'org.technologybrewery.db.JavaMigrationChecksumEnum'
 }
 ```
 If more granularity is desired for selecting the input source files for which to calculate
@@ -45,10 +45,10 @@ The plugin automatically adds the `generateJavaMigrationChecksum` to the [compil
 task and adds the configured `destination` to the appropriate `java` [SourceSet](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceSet.html).
 Developers may wire checksums contained in the generated `Enum` into their migrations:
 ```
-package org.cpointe.db.migration;
+package org.technologybrewery.db.migration;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.bitbucket.cpointe.db.JavaMigrationChecksumEnum;
+import org.technologybrewery.db.JavaMigrationChecksumEnum;
 
 public class R__create_complex_business_objects extends BaseJavaMigration {
   @Override
