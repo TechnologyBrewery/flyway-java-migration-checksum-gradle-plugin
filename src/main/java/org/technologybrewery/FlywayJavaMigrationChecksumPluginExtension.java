@@ -55,7 +55,7 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	 * as a helper accessor to allow for the linking of configurations from this extension into the corresponding
 	 * {@link GenerateJavaMigrationChecksumTask} task.
 	 *
-	 * @return
+	 * 
 	 */
 	protected ConfigurableFileCollection getMigrationSourceFiles() {
 		return this.migrationSourceFiles;
@@ -66,7 +66,7 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	 * Gets any Any-style include/exclude patterns that may be used to further refine the set of migration
 	 * source files that will be targeted by {@link GenerateJavaMigrationChecksumTask}.
 	 *
-	 * @return
+	 * 
 	 */
 	protected PatternFilterable getPatternSet() {
 		return this.patternSet;
@@ -89,8 +89,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an Ant style include path, which may be further augmented with other inclusion or exclusion patterns.
 	 *
-	 * @param includes
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension include(String... includes) {
 		patternSet.include(includes);
@@ -100,8 +100,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an Ant style include path, which may be further augmented with other inclusion or exclusion patterns.
 	 *
-	 * @param includes
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension include(Iterable<String> includes) {
 		patternSet.include(includes);
@@ -111,8 +111,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an include spec, which may be further augmented with other include/exclude specs.
 	 *
-	 * @param includeSpec
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension include(Spec<FileTreeElement> includeSpec) {
 		patternSet.include(includeSpec);
@@ -122,8 +122,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an include spec, which may be further augmented with other include/exclude specs
 	 *
-	 * @param includeSpec
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension include(Closure includeSpec) {
 		patternSet.include(includeSpec);
@@ -133,8 +133,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an Ant style exclude path, which may be further augmented with other inclusion or exclusion patterns
 	 *
-	 * @param excludes
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension exclude(String... excludes) {
 		patternSet.exclude(excludes);
@@ -144,8 +144,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an Ant style exclude path, which may be further augmented with other inclusion or exclusion patterns.
 	 *
-	 * @param excludes
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension exclude(Iterable<String> excludes) {
 		patternSet.exclude(excludes);
@@ -155,8 +155,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an exclude spec, which may be further augmented with other include/exclude specs.
 	 *
-	 * @param excludeSpec
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension exclude(Spec<FileTreeElement> excludeSpec) {
 		patternSet.exclude(excludeSpec);
@@ -166,8 +166,8 @@ public abstract class FlywayJavaMigrationChecksumPluginExtension {
 	/**
 	 * Adds an exclude spec, which may be further augmented with other include/exclude specs.
 	 *
-	 * @param excludeSpec
-	 * @return
+	 * 
+	 * 
 	 */
 	public FlywayJavaMigrationChecksumPluginExtension exclude(Closure excludeSpec) {
 		patternSet.exclude(excludeSpec);

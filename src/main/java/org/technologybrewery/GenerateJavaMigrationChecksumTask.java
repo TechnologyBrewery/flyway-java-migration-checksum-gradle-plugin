@@ -1,5 +1,13 @@
 package org.technologybrewery;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.CRC32;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -20,12 +28,6 @@ import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.CRC32;
 
 /**
  * Gradle task that uses Velocity to generate an enum class containing checksums of the specified Java-based Flyway
@@ -100,7 +102,7 @@ public abstract class GenerateJavaMigrationChecksumTask extends DefaultTask {
 	 * Sets any Ant-style include/exclude patterns for filtering migration source files that were provided via
 	 * the plugin extension DSL.
 	 *
-	 * @param patternSet
+	 * 
 	 */
 	protected void setPatternSet(PatternFilterable patternSet) {
 		this.patternSet = patternSet;
@@ -110,7 +112,7 @@ public abstract class GenerateJavaMigrationChecksumTask extends DefaultTask {
 	 * Gets any Ant-style include/exclude patterns for filtering migration source files that were provided via
 	 * the plugin extension DSL.
 	 *
-	 * @return
+	 * 
 	 */
 	@Internal
 	protected PatternFilterable getPatternSet() {
@@ -153,7 +155,7 @@ public abstract class GenerateJavaMigrationChecksumTask extends DefaultTask {
 		context.put("className", StringUtils.substringAfterLast(checksumEnumClassName, "."));
 		context.put("checksumAndSrcFileNamePairs", checksumAndSrcFileNamePairs);
 
-		try (Writer enumWriter = new FileWriter(checksumEnumFile)) {
+		try (Writer enumWriter = Files.newBufferedWriter(checksumEnumFile.toPath(), UTF_8)) {
 			template.merge(context, enumWriter);
 		} catch (IOException e) {
 			throw new GradleException(String.format("Could not write Java migration checksum Enum at %s",
@@ -167,15 +169,15 @@ public abstract class GenerateJavaMigrationChecksumTask extends DefaultTask {
 	 * the start of the file, if it exists, using {@link BOMInputStream}. Next, iterate through each line of the source
 	 * code, strip any line breaks, and compute the CRC32 checksum.
 	 *
-	 * @param migrationSrcFileStream
-	 * @return
-	 * @throws IOException
+	 * 
+	 * 
+	 * 
 	 */
 	protected int calculateChecksum(InputStream migrationSrcFileStream) throws IOException {
 		CRC32 crc32 = new CRC32();
 
 		try (BufferedReader bufferedReader = new BufferedReader(
-				new InputStreamReader(new BOMInputStream(migrationSrcFileStream)))) {
+				new InputStreamReader(new BOMInputStream(migrationSrcFileStream), UTF_8))) {
 			bufferedReader.lines().map(line -> {
 				return StringUtils.stripEnd(line, "\r\n");
 			}).forEach(line -> {
