@@ -15,6 +15,8 @@ plugins {
   id 'org.technologybrewery.flyway-java-migration-checksum-gradle-plugin' version '2.0.0'
 }
 ```
+:warning: Versions of this plugin prior to **2.0.0** are published under **org.bitbucket.cpointe.flyway-java-migration-checksum-gradle-plugin**
+
 Configure the plugin to specify the desired source files, which should be Java-based Flyway migrations, for which to
 calculate checksums, and the name/location of the generated `Enum` class:
 ```
